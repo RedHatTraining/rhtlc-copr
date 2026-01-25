@@ -2,6 +2,8 @@
 
 Public repository for RHTLC (Red Hat Training Lab Connector) Linux releases and RPM packages.
 
+> **🔧 COPR Build Fix**: If you're getting "Bad file" errors in COPR, see [QUICK_FIX.md](QUICK_FIX.md) - you need to change the build method from `rpkg` to `make`.
+
 ## Overview
 
 This repository contains:
