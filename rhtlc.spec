@@ -15,7 +15,7 @@ URL: https://github.com/RedHatTraining/rhtlc-copr
 Source0: rhtlc-linux-x86_64
 Source1: rhtlc-gui-linux-x86_64
 Source2: RHTLC-GUI.desktop
-# Source3: rhtlc-icon.png (add icon when available)
+Source3: RHTLC-Logo.jpeg
 
 Requires: python3 >= 3.8
 
@@ -45,8 +45,6 @@ mkdir -p $RPM_BUILD_ROOT/opt/RHTLC
 mkdir -p $RPM_BUILD_ROOT/usr/bin
 mkdir -p $RPM_BUILD_ROOT/usr/share/applications
 mkdir -p $RPM_BUILD_ROOT/usr/share/doc/RHTLC
-# Uncomment when icon is available:
-# mkdir -p $RPM_BUILD_ROOT/usr/share/icons/hicolor/48x48/apps
 
 # Copy binaries (now available in %{_sourcedir} via Source declarations)
 cp -p %{_sourcedir}/rhtlc-linux-x86_64 $RPM_BUILD_ROOT/opt/RHTLC/rhtlc
@@ -55,8 +53,8 @@ cp -p %{_sourcedir}/rhtlc-gui-linux-x86_64 $RPM_BUILD_ROOT/opt/RHTLC/rhtlc-gui
 # Copy desktop file
 cp -p %{_sourcedir}/RHTLC-GUI.desktop $RPM_BUILD_ROOT/usr/share/applications/
 
-# Uncomment when icon is available:
-# cp -p %{_sourcedir}/rhtlc-icon.png $RPM_BUILD_ROOT/usr/share/icons/hicolor/48x48/apps/rhtlc.png
+# Copy icon
+cp -p %{_sourcedir}/RHTLC-Logo.jpeg $RPM_BUILD_ROOT/opt/RHTLC/RHTLC-Logo.jpeg
 
 # Create symbolic links in /usr/bin
 ln -s /opt/RHTLC/rhtlc $RPM_BUILD_ROOT/usr/bin/rhtlc
@@ -84,6 +82,7 @@ rhtlc-gui
 ## Installation Directories
 
 - Binaries: /opt/RHTLC/
+- Icon: /opt/RHTLC/RHTLC-Logo.jpeg
 - Symlinks: /usr/bin/rhtlc, /usr/bin/rhtlc-gui
 - Desktop file: /usr/share/applications/RHTLC-GUI.desktop
 - Documentation: /usr/share/doc/RHTLC/
@@ -112,10 +111,9 @@ rm -rf $RPM_BUILD_ROOT
 %dir /opt/RHTLC
 %attr(0755,root,root) /opt/RHTLC/rhtlc
 %attr(0755,root,root) /opt/RHTLC/rhtlc-gui
+%attr(0644,root,root) /opt/RHTLC/RHTLC-Logo.jpeg
 %attr(0644,root,root) /usr/share/applications/RHTLC-GUI.desktop
 %doc /usr/share/doc/RHTLC/README.md
-# Uncomment when icon is available:
-# /usr/share/icons/hicolor/48x48/apps/rhtlc.png
 /usr/bin/rhtlc
 /usr/bin/rhtlc-gui
 
@@ -125,21 +123,12 @@ if [ -x /usr/bin/update-desktop-database ]; then
     /usr/bin/update-desktop-database -q /usr/share/applications || :
 fi
 
-# Update icon cache if available (uncomment when icon is added)
-# if [ -x /usr/bin/gtk-update-icon-cache ]; then
-#     /usr/bin/gtk-update-icon-cache -q /usr/share/icons/hicolor || :
-# fi
-
 %postun
 # Update desktop database after removal
 if [ $1 -eq 0 ]; then
     if [ -x /usr/bin/update-desktop-database ]; then
         /usr/bin/update-desktop-database -q /usr/share/applications || :
     fi
-    # Uncomment when icon is added:
-    # if [ -x /usr/bin/gtk-update-icon-cache ]; then
-    #     /usr/bin/gtk-update-icon-cache -q /usr/share/icons/hicolor || :
-    # fi
 fi
 
 %changelog
