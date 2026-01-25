@@ -1,0 +1,15 @@
+#!/usr/bin/env xdg-open
+[Desktop Entry]
+Name=RHTLC GUI
+GenericName=Red Hat Training Lab Connector
+X-GNOME-FullName=Red Hat Training Lab Connector - Graphical Interface
+Comment=Connect to Red Hat training lab environments via SSH tunnels
+Exec=/opt/RHTLC/rhtlc-gui
+Terminal=false
+Icon=rhtlc
+Type=Application
+StartupNotify=true
+Categories=GTK;GNOME;Network;RemoteAccess;
+Keywords=ssh;tunnel;proxy;socks;training;lab;redhat;
+Name[en_US]=RHTLC GUI
+MimeType=application/x-rhtlc-config;
