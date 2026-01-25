@@ -58,34 +58,28 @@ srpm:
 		--define "_builddir $(CURDIR)" \
 		$(spec) || (echo "ERROR: rpmbuild failed"; exit 1)
 	
-	echo ""
-	echo "Verifying SRPM was created..."
-	
-	# Find the SRPM that was just created
-	SRPM_FILE=$$(find $(OUTDIR) -name "*.src.rpm" -type f | head -1)
-	
-	if [ -z "$$SRPM_FILE" ]; then
-		echo "ERROR: No SRPM found in $(OUTDIR)"
-		echo "Listing output directory:"
-		ls -lhR $(OUTDIR)/ || true
-		echo "Searching everywhere for SRPM:"
-		find . -name "*.src.rpm" -ls || true
-		exit 1
+	@echo ""
+	@echo "Verifying SRPM was created..."
+	@ls -lh $(OUTDIR)/*.src.rpm 2>/dev/null || echo "Checking for SRPM..."
+	@if [ -f $(OUTDIR)/*.src.rpm ]; then \
+		echo "SRPM created successfully!"; \
+		ls -lh $(OUTDIR)/*.src.rpm; \
+	else \
+		echo "ERROR: No SRPM found in $(OUTDIR)"; \
+		ls -lhR $(OUTDIR)/ || true; \
+		exit 1; \
 	fi
 	
-	echo "SRPM created successfully: $$SRPM_FILE"
-	ls -lh $$SRPM_FILE
-	
-	# Also copy to /var/lib/copr-rpmbuild/results if different from OUTDIR
-	if [ "$(OUTDIR)" != "/var/lib/copr-rpmbuild/results" ] && [ -d "/var/lib/copr-rpmbuild/results" ]; then
-		echo "Copying SRPM to /var/lib/copr-rpmbuild/results/"
-		cp -v $$SRPM_FILE /var/lib/copr-rpmbuild/results/ || echo "Could not copy to /var/lib/copr-rpmbuild/results"
+	@echo ""
+	@echo "Checking if COPR results directory exists..."
+	@if [ "$(OUTDIR)" != "/var/lib/copr-rpmbuild/results" ] && [ -d "/var/lib/copr-rpmbuild/results" ]; then \
+		echo "Copying SRPM to /var/lib/copr-rpmbuild/results/"; \
+		cp -v $(OUTDIR)/*.src.rpm /var/lib/copr-rpmbuild/results/ || echo "Could not copy to /var/lib/copr-rpmbuild/results"; \
 	fi
 	
-	echo ""
-	echo "Final check - listing OUTDIR:"
-	ls -lh $(OUTDIR)/*.src.rpm || echo "No SRPM in $(OUTDIR)"
-	echo ""
-	echo "========================================="
-	echo "SRPM build completed successfully!"
-	echo "========================================="
+	@echo ""
+	@echo "========================================="
+	@echo "SRPM build completed successfully!"
+	@echo "========================================="
+	@echo "Output location: $(OUTDIR)"
+	@ls -lh $(OUTDIR)/*.src.rpm
