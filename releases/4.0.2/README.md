@@ -1,6 +1,6 @@
 # RHTLC 4.0.2 - Linux Binaries
 
-Release Date: 2026-02-27
+Release Date: 2026-03-02
 Source: https://github.com/RedHatTraining/dle-wstunnel-ole/releases/tag/v4.0.2
 
 ## Files
