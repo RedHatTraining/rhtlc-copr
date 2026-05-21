@@ -10,8 +10,8 @@ Source: https://github.com/RedHatTraining/dle-wstunnel-ole/releases/tag/v5.0.8
 
 ## SHA256 Checksums
 
-3ae83c0cb9d4af979ce00413dc6f8c125becc75a1fc9abae85d2d7e177dcae0e  rhtlc-linux-x86_64
-c16657d5bd326493792095bdccf7078facaec0b1e6bcad404cf11119a9ac2fa9  rhtlc-gui-linux-x86_64
+bf113cbc63678fefbec3685e4e17898dfcae8d3fe629085bbc801ade1c0f62f7  rhtlc-linux-x86_64
+7d12ec8d633cc9e696c61732febd5618d3d306d2c594a0725b2de32e664facaf  rhtlc-gui-linux-x86_64
 
 ## Usage
 
