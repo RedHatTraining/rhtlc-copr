@@ -1,5 +1,5 @@
 %define name rhtlc
-%define version 5.0.7
+%define version 5.0.8
 %define release 1
 %define buildroot %{_tmppath}/%{name}-%{version}-%{release}-root
 
