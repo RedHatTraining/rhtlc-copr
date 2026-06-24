@@ -18,7 +18,7 @@ This repository contains:
 
 ```bash
 # Enable the COPR repository
-sudo dnf copr enable redhattraining/rhtlc
+sudo dnf copr enable tmichett/RHTLC
 
 # Install RHTLC
 sudo dnf install rhtlc
@@ -189,7 +189,7 @@ This is a public mirror repository for binary releases. Source code is in the pr
 
 - **Documentation**: See [RPM_BUILD_INSTRUCTIONS.md](RPM_BUILD_INSTRUCTIONS.md)
 - **Issues**: https://github.com/RedHatTraining/rhtlc-copr/issues
-- **COPR Project**: https://copr.fedorainfracloud.org/coprs/redhattraining/rhtlc/
+- **COPR Project**: https://copr.fedorainfracloud.org/coprs/tmichett/RHTLC/
 
 ## License
 

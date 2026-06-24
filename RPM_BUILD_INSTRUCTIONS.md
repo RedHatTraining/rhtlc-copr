@@ -158,7 +158,7 @@ Once the package is built in COPR:
 
 ```bash
 # Enable the COPR repository
-sudo dnf copr enable your-username/rhtlc
+sudo dnf copr enable tmichett/RHTLC
 
 # Install the package
 sudo dnf install rhtlc
