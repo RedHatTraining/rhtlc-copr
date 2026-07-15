@@ -1,6 +1,6 @@
 %define name rhtlc
 %define version 5.1.0
-%define release 1
+%define release 2
 %define buildroot %{_tmppath}/%{name}-%{version}-%{release}-root
 
 Summary: Red Hat Training Lab Connector - CLI and GUI tools
@@ -12,10 +12,14 @@ Group: Applications/Internet
 BuildRoot: %{buildroot}
 AutoReqProv: no
 URL: https://github.com/RedHatTraining/rhtlc-copr
+# All four binaries ship in the SRPM unconditionally. COPR builds the SRPM
+# once and reuses it for every chroot — do NOT use %ifarch on SourceN.
 Source0: rhtlc-linux-x86_64
 Source1: rhtlc-gui-linux-x86_64
-Source2: RHTLC-GUI.desktop
-Source3: RHTLC-Logo.jpeg
+Source2: rhtlc-linux-arm64
+Source3: rhtlc-gui-linux-arm64
+Source4: RHTLC-GUI.desktop
+Source5: RHTLC-Logo.jpeg
 
 Requires: python3 >= 3.8
 
@@ -46,9 +50,14 @@ mkdir -p $RPM_BUILD_ROOT/usr/bin
 mkdir -p $RPM_BUILD_ROOT/usr/share/applications
 mkdir -p $RPM_BUILD_ROOT/usr/share/doc/RHTLC
 
-# Copy binaries (now available in %{_sourcedir} via Source declarations)
+# %install runs per-chroot — pick the matching pre-built binary pair here
+%ifarch aarch64
+cp -p %{_sourcedir}/rhtlc-linux-arm64 $RPM_BUILD_ROOT/opt/RHTLC/rhtlc
+cp -p %{_sourcedir}/rhtlc-gui-linux-arm64 $RPM_BUILD_ROOT/opt/RHTLC/rhtlc-gui
+%else
 cp -p %{_sourcedir}/rhtlc-linux-x86_64 $RPM_BUILD_ROOT/opt/RHTLC/rhtlc
 cp -p %{_sourcedir}/rhtlc-gui-linux-x86_64 $RPM_BUILD_ROOT/opt/RHTLC/rhtlc-gui
+%endif
 
 # Copy desktop file
 cp -p %{_sourcedir}/RHTLC-GUI.desktop $RPM_BUILD_ROOT/usr/share/applications/
@@ -91,7 +100,7 @@ rhtlc-gui
 
 - RHEL/Fedora/AlmaLinux/Rocky Linux 8 or later
 - glibc 2.28 or later
-- x86_64 architecture
+- x86_64 or aarch64 architecture
 - Python 3.8 or later
 
 ## Source Repository
@@ -132,6 +141,11 @@ if [ $1 -eq 0 ]; then
 fi
 
 %changelog
+* Wed Jul 15 2026 RHTLC Build <travis@michettetech.com> - 5.1.0-2
+- Multi-arch: ship x86_64 and aarch64 (arm64) binaries in one SRPM
+- %install selects the matching binary pair per COPR chroot via %%ifarch
+- Compatible with Fedora/EPEL x86_64 and aarch64 chroots
+
 * Sat Jan 25 2025 RHTLC Build <travis@michettetech.com> - 3.4.3-1
 - Initial RPM package for RHTLC
 - Includes CLI tool (rhtlc) for command-line operations

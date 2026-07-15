@@ -27,15 +27,16 @@ sudo dnf install rhtlc
 ### Method 2: Direct Binary Download
 
 ```bash
-VERSION="3.4.3"
+VERSION="5.1.0"
+# Use rhtlc-linux-arm64 / rhtlc-gui-linux-arm64 on aarch64
 
-# Download CLI
+# Download CLI (x86_64 example)
 curl -L -o rhtlc \
   https://github.com/RedHatTraining/rhtlc-copr/raw/main/releases/${VERSION}/rhtlc-linux-x86_64
 chmod +x rhtlc
 sudo mv rhtlc /usr/local/bin/
 
-# Download GUI
+# Download GUI (x86_64 example)
 curl -L -o rhtlc-gui \
   https://github.com/RedHatTraining/rhtlc-copr/raw/main/releases/${VERSION}/rhtlc-gui-linux-x86_64
 chmod +x rhtlc-gui
@@ -71,16 +72,18 @@ rhtlc-copr/
 │   └── Makefile                  # COPR build configuration
 └── releases/
     ├── README.md
-    └── 3.4.3/
-        ├── rhtlc-linux-x86_64        # CLI binary
-        ├── rhtlc-gui-linux-x86_64    # GUI binary
-        └── README.md                  # Version-specific info
+    └── 5.1.0/
+        ├── rhtlc-linux-x86_64         # CLI (x86_64)
+        ├── rhtlc-gui-linux-x86_64     # GUI (x86_64)
+        ├── rhtlc-linux-arm64          # CLI (aarch64)
+        ├── rhtlc-gui-linux-arm64      # GUI (aarch64)
+        └── README.md
 ```
 
 ## System Requirements
 
 - **Operating System**: RHEL/Fedora/AlmaLinux/Rocky Linux 8 or later
-- **Architecture**: x86_64
+- **Architecture**: x86_64 or aarch64
 - **glibc**: Version 2.28 or later
 - **Python**: 3.8 or later (runtime dependency)
 - **Desktop**: Any Linux desktop environment with X11 or Wayland (for GUI)

@@ -12,9 +12,11 @@ This repository contains the files necessary to build RHTLC RPM packages using C
 
 ### Binary Sources
 
-The spec file references binaries from the `releases/` directory:
-- `rhtlc-linux-x86_64` - CLI binary
-- `rhtlc-gui-linux-x86_64` - GUI binary
+The spec file references binaries from the `releases/` directory (all four ship in the SRPM):
+- `rhtlc-linux-x86_64` / `rhtlc-gui-linux-x86_64` — x86_64
+- `rhtlc-linux-arm64` / `rhtlc-gui-linux-arm64` — aarch64
+
+COPR builds the SRPM **once** and reuses it for every chroot. `.copr/Makefile` therefore downloads **both** arches unconditionally; `rhtlc.spec` `%install` uses `%ifarch aarch64` to install the matching pair.
 
 These binaries are automatically published by the GitHub Actions workflow from the main repository.
 
@@ -114,8 +116,10 @@ copr_url = https://copr.fedorainfracloud.org
 copr-cli create rhtlc \
   --chroot fedora-39-x86_64 \
   --chroot fedora-40-x86_64 \
+  --chroot fedora-42-aarch64 \
   --chroot epel-8-x86_64 \
   --chroot epel-9-x86_64 \
+  --chroot epel-9-aarch64 \
   --description "Red Hat Training Lab Connector - CLI and GUI tools"
 ```
 
@@ -218,7 +222,7 @@ To update to a new version:
 
 - RHEL/Fedora/AlmaLinux/Rocky Linux 8 or later
 - glibc 2.28 or later
-- x86_64 architecture
+- x86_64 or aarch64 architecture
 - Python 3.8 or later
 
 ## Troubleshooting
