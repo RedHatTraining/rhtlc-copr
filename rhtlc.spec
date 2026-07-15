@@ -1,6 +1,6 @@
 %define name rhtlc
 %define version 5.1.0
-%define release 3
+%define release 4
 %define buildroot %{_tmppath}/%{name}-%{version}-%{release}-root
 
 Summary: Red Hat Training Lab Connector - CLI and GUI tools
@@ -13,7 +13,7 @@ BuildRoot: %{buildroot}
 AutoReqProv: no
 URL: https://github.com/RedHatTraining/rhtlc-copr
 # All four binaries ship in the SRPM unconditionally. COPR builds the SRPM
-# once and reuses it for every chroot — do NOT use %ifarch on SourceN.
+# once and reuses it for every chroot — do NOT use ifarch conditionals on SourceN.
 Source0: rhtlc-linux-x86_64
 Source1: rhtlc-gui-linux-x86_64
 Source2: rhtlc-linux-arm64
@@ -50,7 +50,8 @@ mkdir -p $RPM_BUILD_ROOT/usr/bin
 mkdir -p $RPM_BUILD_ROOT/usr/share/applications
 mkdir -p $RPM_BUILD_ROOT/usr/share/doc/RHTLC
 
-# %install runs per-chroot — pick the matching pre-built binary pair here
+# Arch selection runs per-chroot — pick the matching pre-built binary pair here
+# (EPEL/RHEL rpmparse treats percent-macros even inside comments — avoid them here)
 %ifarch aarch64
 cp -p %{_sourcedir}/rhtlc-linux-arm64 $RPM_BUILD_ROOT/opt/RHTLC/rhtlc
 cp -p %{_sourcedir}/rhtlc-gui-linux-arm64 $RPM_BUILD_ROOT/opt/RHTLC/rhtlc-gui
@@ -141,15 +142,19 @@ if [ $1 -eq 0 ]; then
 fi
 
 %changelog
-* Wed Jul 15 2026 RHTLC Build <travis@michettetech.com> - 5.1.0-3
-- Escape %%install in changelog (EPEL/RHEL rpmparse treated bare %%install as a second section)
+* Wed Jul 15 2026 RHTLC Build <travis@michettetech.com> - 5.1.0-4
+- Remove bare percent-macros from comments (EPEL/RHEL parse them; caused second install section)
 - Multi-arch: ship x86_64 and aarch64 (arm64) binaries in one SRPM
-- %%install selects the matching binary pair per COPR chroot via %%ifarch
+- Install section selects the matching binary pair per COPR chroot via ifarch
+- Compatible with Fedora/EPEL x86_64 and aarch64 chroots
+
+* Wed Jul 15 2026 RHTLC Build <travis@michettetech.com> - 5.1.0-3
+- Escape percent-macros in changelog for EPEL/RHEL rpmparse
+- Multi-arch: ship x86_64 and aarch64 (arm64) binaries in one SRPM
 - Compatible with Fedora/EPEL x86_64 and aarch64 chroots
 
 * Wed Jul 15 2026 RHTLC Build <travis@michettetech.com> - 5.1.0-2
 - Multi-arch: ship x86_64 and aarch64 (arm64) binaries in one SRPM
-- %%install selects the matching binary pair per COPR chroot via %%ifarch
 - Compatible with Fedora/EPEL x86_64 and aarch64 chroots
 
 * Sat Jan 25 2025 RHTLC Build <travis@michettetech.com> - 3.4.3-1
