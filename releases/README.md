@@ -8,10 +8,10 @@ Each version has its own directory containing CLI and GUI binaries for x86_64 an
 
 ## Binary Information
 
-- rhtlc-linux-x86_64: CLI (x86_64)
-- rhtlc-gui-linux-x86_64: GUI (x86_64)
-- rhtlc-linux-arm64: CLI (aarch64 / arm64)
-- rhtlc-gui-linux-arm64: GUI (aarch64 / arm64)
+- rhtlc-linux-x86_64.tar.gz: CLI onedir (x86_64)
+- rhtlc-gui-linux-x86_64.tar.gz: GUI onedir (x86_64)
+- rhtlc-linux-arm64.tar.gz: CLI onedir (aarch64 / arm64)
+- rhtlc-gui-linux-arm64.tar.gz: GUI onedir (aarch64 / arm64)
 
 ## Platform Support
 
