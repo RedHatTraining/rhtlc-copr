@@ -1,6 +1,6 @@
 %define name rhtlc
 %define version 6.0.1
-%define release 2
+%define release 3
 %define buildroot %{_tmppath}/%{name}-%{version}-%{release}-root
 
 Summary: Red Hat Training Lab Connector - CLI and GUI tools
@@ -24,6 +24,7 @@ Source2: rhtlc-linux-arm64.tar.gz
 Source3: rhtlc-gui-linux-arm64.tar.gz
 Source4: RHTLC-GUI.desktop
 Source5: RHTLC-Logo.jpeg
+Source6: RH-Icon-256.png
 
 Requires: python3 >= 3.8
 
@@ -58,6 +59,8 @@ mkdir -p $RPM_BUILD_ROOT/opt/RHTLC/rhtlc
 mkdir -p $RPM_BUILD_ROOT/opt/RHTLC/rhtlc-gui
 mkdir -p $RPM_BUILD_ROOT/usr/bin
 mkdir -p $RPM_BUILD_ROOT/usr/share/applications
+mkdir -p $RPM_BUILD_ROOT/usr/share/icons/hicolor/48x48/apps
+mkdir -p $RPM_BUILD_ROOT/usr/share/icons/hicolor/256x256/apps
 mkdir -p $RPM_BUILD_ROOT/usr/share/doc/RHTLC
 
 # Arch selection runs per-chroot — pick the matching onedir pair here
@@ -86,8 +89,12 @@ if [ -d $RPM_BUILD_ROOT/opt/RHTLC/rhtlc-gui/_internal/cli ]; then
         -type f -exec chmod 0755 {} \;
 fi
 
+# Desktop Exec=rhtlc-gui resolves via /usr/bin symlink (not /opt/RHTLC/rhtlc-gui,
+# which is the onedir directory). JPEG is for in-app Help; GNOME needs hicolor PNGs.
 cp -p %{_sourcedir}/RHTLC-GUI.desktop $RPM_BUILD_ROOT/usr/share/applications/
 cp -p %{_sourcedir}/RHTLC-Logo.jpeg $RPM_BUILD_ROOT/opt/RHTLC/RHTLC-Logo.jpeg
+cp -p %{_sourcedir}/RH-Icon-256.png $RPM_BUILD_ROOT/usr/share/icons/hicolor/48x48/apps/rhtlc-gui.png
+cp -p %{_sourcedir}/RH-Icon-256.png $RPM_BUILD_ROOT/usr/share/icons/hicolor/256x256/apps/rhtlc-gui.png
 
 # Create basic documentation
 cat > $RPM_BUILD_ROOT/usr/share/doc/RHTLC/README.md << 'EOF'
@@ -111,9 +118,10 @@ rhtlc-gui
 ## Installation Directories
 
 - Onedir bundles: /opt/RHTLC/rhtlc/ and /opt/RHTLC/rhtlc-gui/
-- Icon: /opt/RHTLC/RHTLC-Logo.jpeg
+- In-app JPEG: /opt/RHTLC/RHTLC-Logo.jpeg
+- GNOME icons: /usr/share/icons/hicolor/{48x48,256x256}/apps/rhtlc-gui.png
 - Symlinks: /usr/bin/rhtlc, /usr/bin/rhtlc-gui
-- Desktop file: /usr/share/applications/RHTLC-GUI.desktop
+- Desktop file: /usr/share/applications/RHTLC-GUI.desktop (Exec=rhtlc-gui, Icon=rhtlc-gui)
 - Documentation: /usr/share/doc/RHTLC/
 
 ## System Requirements
@@ -141,18 +149,35 @@ rm -rf $RPM_BUILD_ROOT
 /opt/RHTLC/rhtlc/
 /opt/RHTLC/rhtlc-gui/
 %attr(0644,root,root) /opt/RHTLC/RHTLC-Logo.jpeg
+%attr(0644,root,root) /usr/share/icons/hicolor/48x48/apps/rhtlc-gui.png
+%attr(0644,root,root) /usr/share/icons/hicolor/256x256/apps/rhtlc-gui.png
 %attr(0644,root,root) /usr/share/applications/RHTLC-GUI.desktop
 %doc /usr/share/doc/RHTLC/README.md
 /usr/bin/rhtlc
 /usr/bin/rhtlc-gui
 
 %post
+# Refresh GNOME/Freedesktop icon theme cache for Icon=rhtlc-gui
+if [ -x /usr/bin/gtk-update-icon-cache ]; then
+    /usr/bin/gtk-update-icon-cache -q /usr/share/icons/hicolor || :
+fi
+
 # Update desktop database if available
 if [ -x /usr/bin/update-desktop-database ]; then
     /usr/bin/update-desktop-database -q /usr/share/applications || :
 fi
 
+# Register rhtlc:// URL scheme (best-effort; scriptlet runs as root)
+if [ -x /usr/bin/xdg-mime ]; then
+    mkdir -p "${HOME:-/root}/.config" 2>/dev/null || :
+    /usr/bin/xdg-mime default RHTLC-GUI.desktop x-scheme-handler/rhtlc >/dev/null 2>&1 || :
+fi
+
 %postun
+if [ -x /usr/bin/gtk-update-icon-cache ]; then
+    /usr/bin/gtk-update-icon-cache -q /usr/share/icons/hicolor || :
+fi
+
 # Update desktop database after removal
 if [ $1 -eq 0 ]; then
     if [ -x /usr/bin/update-desktop-database ]; then
@@ -161,6 +186,10 @@ if [ $1 -eq 0 ]; then
 fi
 
 %changelog
+* Tue Sep 08 2026 RHTLC Build <travis@michettetech.com> - 6.0.1-3
+- Match PR app RPM GNOME packaging: Exec=rhtlc-gui, Icon=rhtlc-gui, hicolor PNGs
+- gtk-update-icon-cache in post/postun (JPEG stays for in-app Help only)
+
 * Tue Sep 08 2026 RHTLC Build <travis@michettetech.com> - 6.0.1-2
 - Disable debuginfo and Fedora check-rpaths for prebuilt PyInstaller/Qt onedir trees
 

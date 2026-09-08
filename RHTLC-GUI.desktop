@@ -1,15 +1,13 @@
-#!/usr/bin/env xdg-open
 [Desktop Entry]
+Type=Application
 Name=RHTLC GUI
 GenericName=Red Hat Training Lab Connector
-X-GNOME-FullName=Red Hat Training Lab Connector - Graphical Interface
 Comment=Connect to Red Hat training lab environments via WebSocket tunnel
-Exec=/opt/RHTLC/rhtlc-gui %u
+Exec=rhtlc-gui %u
+Icon=rhtlc-gui
 Terminal=false
-Icon=/opt/RHTLC/RHTLC-Logo.jpeg
-Type=Application
+Categories=Network;Education;
+Keywords=RHTLC;Red Hat;Training;Lab;SOCKS5;tunnel;
+MimeType=x-scheme-handler/rhtlc;
 StartupNotify=true
-Categories=GTK;GNOME;Network;RemoteAccess;
-Keywords=ssh;tunnel;proxy;socks;training;lab;redhat;rhtlc;
-Name[en_US]=RHTLC GUI
-MimeType=x-scheme-handler/rhtlc;application/x-rhtlc-config;
+StartupWMClass=rhtlc-gui
