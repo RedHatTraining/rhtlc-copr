@@ -1,6 +1,6 @@
 %define name rhtlc
 %define version 6.0.1
-%define release 1
+%define release 2
 %define buildroot %{_tmppath}/%{name}-%{version}-%{release}-root
 
 Summary: Red Hat Training Lab Connector - CLI and GUI tools
@@ -11,6 +11,10 @@ License: MIT
 Group: Applications/Internet
 BuildRoot: %{buildroot}
 AutoReqProv: no
+# Prebuilt PyInstaller onedir trees. Skip debuginfo and Fedora check-rpaths
+# (Qt ships invalid RPATHs like /home/qt/icu_install/lib).
+%global debug_package %{nil}
+%global __brp_check_rpaths %{nil}
 URL: https://github.com/RedHatTraining/rhtlc-copr
 # All four onedir archives ship in the SRPM unconditionally. COPR builds the SRPM
 # once and reuses it for every chroot — do NOT use ifarch conditionals on SourceN.
@@ -157,6 +161,9 @@ if [ $1 -eq 0 ]; then
 fi
 
 %changelog
+* Tue Sep 08 2026 RHTLC Build <travis@michettetech.com> - 6.0.1-2
+- Disable debuginfo and Fedora check-rpaths for prebuilt PyInstaller/Qt onedir trees
+
 * Tue Sep 08 2026 RHTLC Build <travis@michettetech.com> - 6.0.1-1
 - Install PyInstaller onedir trees from tar.gz sources (CLI+GUI, x86_64 and arm64)
 - PATH still exposes rhtlc and rhtlc-gui via /usr/bin symlinks
