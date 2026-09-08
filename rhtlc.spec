@@ -1,6 +1,6 @@
 %define name rhtlc
-%define version 5.1.2
-%define release 4
+%define version 6.0.1
+%define release 1
 %define buildroot %{_tmppath}/%{name}-%{version}-%{release}-root
 
 Summary: Red Hat Training Lab Connector - CLI and GUI tools
@@ -12,12 +12,12 @@ Group: Applications/Internet
 BuildRoot: %{buildroot}
 AutoReqProv: no
 URL: https://github.com/RedHatTraining/rhtlc-copr
-# All four binaries ship in the SRPM unconditionally. COPR builds the SRPM
+# All four onedir archives ship in the SRPM unconditionally. COPR builds the SRPM
 # once and reuses it for every chroot — do NOT use ifarch conditionals on SourceN.
-Source0: rhtlc-linux-x86_64
-Source1: rhtlc-gui-linux-x86_64
-Source2: rhtlc-linux-arm64
-Source3: rhtlc-gui-linux-arm64
+Source0: rhtlc-linux-x86_64.tar.gz
+Source1: rhtlc-gui-linux-x86_64.tar.gz
+Source2: rhtlc-linux-arm64.tar.gz
+Source3: rhtlc-gui-linux-arm64.tar.gz
 Source4: RHTLC-GUI.desktop
 Source5: RHTLC-Logo.jpeg
 
@@ -38,37 +38,52 @@ Features:
 This package includes both the CLI (rhtlc) and GUI (rhtlc-gui) applications.
 
 %prep
-# No preparation needed for pre-built binaries
+# Create the build directory, then extract all four onedir archives into it
+%setup -q -T -c -n %{name}-%{version}
+tar -xzf %{_sourcedir}/rhtlc-linux-x86_64.tar.gz
+tar -xzf %{_sourcedir}/rhtlc-gui-linux-x86_64.tar.gz
+tar -xzf %{_sourcedir}/rhtlc-linux-arm64.tar.gz
+tar -xzf %{_sourcedir}/rhtlc-gui-linux-arm64.tar.gz
 
 %build
-# No build process needed for pre-built binaries
+# No compile — PyInstaller onedir trees are pre-built
 
 %install
 rm -rf $RPM_BUILD_ROOT
-mkdir -p $RPM_BUILD_ROOT/opt/RHTLC
+mkdir -p $RPM_BUILD_ROOT/opt/RHTLC/rhtlc
+mkdir -p $RPM_BUILD_ROOT/opt/RHTLC/rhtlc-gui
 mkdir -p $RPM_BUILD_ROOT/usr/bin
 mkdir -p $RPM_BUILD_ROOT/usr/share/applications
 mkdir -p $RPM_BUILD_ROOT/usr/share/doc/RHTLC
 
-# Arch selection runs per-chroot — pick the matching pre-built binary pair here
+# Arch selection runs per-chroot — pick the matching onedir pair here
 # (EPEL/RHEL rpmparse treats percent-macros even inside comments — avoid them here)
 %ifarch aarch64
-cp -p %{_sourcedir}/rhtlc-linux-arm64 $RPM_BUILD_ROOT/opt/RHTLC/rhtlc
-cp -p %{_sourcedir}/rhtlc-gui-linux-arm64 $RPM_BUILD_ROOT/opt/RHTLC/rhtlc-gui
+cp -a rhtlc-linux-arm64/. $RPM_BUILD_ROOT/opt/RHTLC/rhtlc/
+cp -a rhtlc-gui-linux-arm64/. $RPM_BUILD_ROOT/opt/RHTLC/rhtlc-gui/
+ln -s /opt/RHTLC/rhtlc/rhtlc-linux-arm64 $RPM_BUILD_ROOT/usr/bin/rhtlc
+ln -s /opt/RHTLC/rhtlc-gui/rhtlc-gui-linux-arm64 $RPM_BUILD_ROOT/usr/bin/rhtlc-gui
+chmod 0755 $RPM_BUILD_ROOT/opt/RHTLC/rhtlc/rhtlc-linux-arm64
+chmod 0755 $RPM_BUILD_ROOT/opt/RHTLC/rhtlc-gui/rhtlc-gui-linux-arm64
 %else
-cp -p %{_sourcedir}/rhtlc-linux-x86_64 $RPM_BUILD_ROOT/opt/RHTLC/rhtlc
-cp -p %{_sourcedir}/rhtlc-gui-linux-x86_64 $RPM_BUILD_ROOT/opt/RHTLC/rhtlc-gui
+cp -a rhtlc-linux-x86_64/. $RPM_BUILD_ROOT/opt/RHTLC/rhtlc/
+cp -a rhtlc-gui-linux-x86_64/. $RPM_BUILD_ROOT/opt/RHTLC/rhtlc-gui/
+ln -s /opt/RHTLC/rhtlc/rhtlc-linux-x86_64 $RPM_BUILD_ROOT/usr/bin/rhtlc
+ln -s /opt/RHTLC/rhtlc-gui/rhtlc-gui-linux-x86_64 $RPM_BUILD_ROOT/usr/bin/rhtlc-gui
+chmod 0755 $RPM_BUILD_ROOT/opt/RHTLC/rhtlc/rhtlc-linux-x86_64
+chmod 0755 $RPM_BUILD_ROOT/opt/RHTLC/rhtlc-gui/rhtlc-gui-linux-x86_64
 %endif
 
-# Copy desktop file
+chmod 0755 $RPM_BUILD_ROOT/opt/RHTLC/rhtlc/_internal/rhtlc-wstunnel
+chmod 0755 $RPM_BUILD_ROOT/opt/RHTLC/rhtlc-gui/_internal/rhtlc-wstunnel
+if [ -d $RPM_BUILD_ROOT/opt/RHTLC/rhtlc-gui/_internal/cli ]; then
+    find $RPM_BUILD_ROOT/opt/RHTLC/rhtlc-gui/_internal/cli \
+        \( -name 'rhtlc-linux-*' -o -name 'rhtlc-wstunnel' \) \
+        -type f -exec chmod 0755 {} \;
+fi
+
 cp -p %{_sourcedir}/RHTLC-GUI.desktop $RPM_BUILD_ROOT/usr/share/applications/
-
-# Copy icon
 cp -p %{_sourcedir}/RHTLC-Logo.jpeg $RPM_BUILD_ROOT/opt/RHTLC/RHTLC-Logo.jpeg
-
-# Create symbolic links in /usr/bin
-ln -s /opt/RHTLC/rhtlc $RPM_BUILD_ROOT/usr/bin/rhtlc
-ln -s /opt/RHTLC/rhtlc-gui $RPM_BUILD_ROOT/usr/bin/rhtlc-gui
 
 # Create basic documentation
 cat > $RPM_BUILD_ROOT/usr/share/doc/RHTLC/README.md << 'EOF'
@@ -91,7 +106,7 @@ rhtlc-gui
 
 ## Installation Directories
 
-- Binaries: /opt/RHTLC/
+- Onedir bundles: /opt/RHTLC/rhtlc/ and /opt/RHTLC/rhtlc-gui/
 - Icon: /opt/RHTLC/RHTLC-Logo.jpeg
 - Symlinks: /usr/bin/rhtlc, /usr/bin/rhtlc-gui
 - Desktop file: /usr/share/applications/RHTLC-GUI.desktop
@@ -119,8 +134,8 @@ rm -rf $RPM_BUILD_ROOT
 %files
 %defattr(-,root,root,-)
 %dir /opt/RHTLC
-%attr(0755,root,root) /opt/RHTLC/rhtlc
-%attr(0755,root,root) /opt/RHTLC/rhtlc-gui
+/opt/RHTLC/rhtlc/
+/opt/RHTLC/rhtlc-gui/
 %attr(0644,root,root) /opt/RHTLC/RHTLC-Logo.jpeg
 %attr(0644,root,root) /usr/share/applications/RHTLC-GUI.desktop
 %doc /usr/share/doc/RHTLC/README.md
@@ -142,6 +157,10 @@ if [ $1 -eq 0 ]; then
 fi
 
 %changelog
+* Tue Sep 08 2026 RHTLC Build <travis@michettetech.com> - 6.0.1-1
+- Install PyInstaller onedir trees from tar.gz sources (CLI+GUI, x86_64 and arm64)
+- PATH still exposes rhtlc and rhtlc-gui via /usr/bin symlinks
+
 * Wed Jul 15 2026 RHTLC Build <travis@michettetech.com> - 5.1.0-4
 - Remove bare percent-macros from comments (EPEL/RHEL parse them; caused second install section)
 - Multi-arch: ship x86_64 and aarch64 (arm64) binaries in one SRPM
